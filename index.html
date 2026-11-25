@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>별자리 점성학 종합 분석 | Cosmic Insight</title>
+<style>
+  :root {
+    --bg: #0b0a1a;
+    --card: #15132b;
+    --card2: #1c1a36;
+    --accent: #c9a227;
+    --accent2: #9b7bff;
+    --text: #e8e4f5;
+    --muted: #9a94b8;
+    --border: #2a2748;
+    --success: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.65;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(155,123,255,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(201,162,39,0.08) 0%, transparent 45%);
+  }
+  .container { max-width: 920px; margin: 0 auto; padding: 24px 16px 80px; }
+  header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  header h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #e8d48b, #c9a227, #9b7bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  header p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2::before {
+    content: '';
+    width: 4px; height: 18px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  input, select {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--accent2); }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background: linear-gradient(135deg, #9b7bff, #6b4fd8);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(155,123,255,0.4); }
+  .btn:active { transform: translateY(0); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  #resultSection { display: none; }
+  .big3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 500px) { .big3 { grid-template-columns: 1fr; } }
+  .big3-item {
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .big3-item .label { font-size: 0.8rem; color: var(--muted); }
+  .big3-item .sign {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 6px 0 2px;
+    color: var(--accent);
+  }
+  .big3-item .degree { font-size: 0.8rem; color: var(--accent2); }
+  .section-body { font-size: 0.95rem; color: #d4d0e8; }
+  .section-body p { margin-bottom: 10px; }
+  .section-body ul { padding-left: 18px; margin-bottom: 10px; }
+  .section-body li { margin-bottom: 4px; }
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    margin: 2px 4px 2px 0;
+    background: rgba(155,123,255,0.15);
+    color: #c4b5fd;
+    border: 1px solid rgba(155,123,255,0.3);
+  }
+  .year-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .year-card {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 4px solid var(--accent2);
+  }
+  .year-card.good { border-left-color: var(--success); }
+  .year-card.warn { border-left-color: var(--warn); }
+  .year-card.bad { border-left-color: var(--danger); }
+  .year-card .yr { font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .rank-list { list-style: none; padding: 0; }
+  .rank-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .rank-list li:last-child { border-bottom: none; }
+  .rank-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #a88b1a);
+    color: #1a1500;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* Chat */
+  #chatSection {
+    margin-top: 28px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+  #chatSection h2 { color: var(--accent2); margin-bottom: 12px; }
+  .chat-box {
+    background: var(--card2);
+    border-radius: 12px;
+    height: 320px;
+    overflow-y: auto;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .msg {
+    margin-bottom: 14px;
+    max-width: 90%;
+  }
+  .msg.user { margin-left: auto; text-align: right; }
+  .msg .bubble {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    text-align: left;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #6b4fd8, #9b7bff);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.bot .bubble {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input-row input { flex: 1; }
+  .chat-input-row .btn { width: auto; margin: 0; padding: 11px 20px; }
+  .hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+  }
+  .planet-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .planet-chip {
+    background: rgba(201,162,39,0.1);
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+  .planet-chip strong { color: var(--accent); }
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>✦ 점성학 종합 분석</h1>
+    <p>Big 3 · 주요 행성 · 지역 보정 기반 개인 천궁도 해석</p>
+  </header>
+
+  <!-- INPUT -->
+  <div class="card" id="inputCard">
+    <h2>출생 정보 입력</h2>
+    <div class="form-grid">
+      <div>
+        <label>생년월일</label>
+        <input type="date" id="birthDate" value="1990-06-15">
+      </div>
+      <div>
+        <label>출생 시간 (24시)</label>
+        <input type="time" id="birthTime" value="14:30">
+      </div>
+      <div>
+        <label>출생 도시 (한국)</label>
+        <select id="citySelect">
+          <option value="37.5665,126.9780">서울</option>
+          <option value="35.1796,129.0756">부산</option>
+          <option value="35.8714,128.6014">대구</option>
+          <option value="37.4563,126.7052">인천</option>
+          <option value="35.1595,126.8526">광주</option>
+          <option value="36.3504,127.3845">대전</option>
+          <option value="35.5384,129.3114">울산</option>
+          <option value="33.4996,126.5312">제주</option>
+          <option value="36.6424,127.4890">청주</option>
+          <option value="35.8242,127.1480">전주</option>
+          <option value="custom">직접 입력 (위도/경도)</option>
+        </select>
+      </div>
+      <div>
+        <label>성별 (선택)</label>
+        <select id="gender">
+          <option value="unknown">선택 안 함</option>
+          <option value="f">여성</option>
+          <option value="m">남성</option>
+        </select>
+      </div>
+    </div>
+    <div id="customLoc" style="display:none; margin-top:14px;" class="form-grid">
+      <div>
+        <label>위도 (예: 37.5665)</label>
+        <input type="number" step="0.0001" id="lat" placeholder="37.5665">
+      </div>
+      <div>
+        <label>경도 (예: 126.9780)</label>
+        <input type="number" step="0.0001" id="lon" placeholder="126.9780">
+      </div>
+    </div>
+    <button class="btn" id="analyzeBtn" onclick="runAnalysis()">✦ 천궁도 분석하기</button>
+    <p class="hint">※ 지역 보정(위·경도)을 반영해 상승궁과 하우스 기준을 계산합니다. 해석은 교육·자기성찰 목적이며 절대적 운명이 아닙니다.</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultSection">
+    <div class="card">
+      <h2>기본 천궁 · Big 3</h2>
+      <div class="big3" id="big3Box"></div>
+      <div class="planet-row" id="planetBox"></div>
+      <p class="hint" id="metaInfo" style="margin-top:12px;"></p>
+    </div>
+
+    <div class="card">
+      <h2>성향 특징</h2>
+      <div class="section-body" id="secPersonality"></div>
+    </div>
+
+    <div class="card">
+      <h2>재능과 개발 필요점</h2>
+      <div class="section-body" id="secTalent"></div>
+    </div>
+
+    <div class="card">
+      <h2>적성 · 진로와 직업운</h2>
+      <div class="section-body" id="secCareer"></div>
+    </div>
+
+    <div class="card">
+      <h2>직업 구조 (조직 · 사업 · 프리)</h2>
+      <div class="section-body" id="secJobStruct"></div>
+    </div>
+
+    <div class="card">
+      <h2>이성운 · 배우자운</h2>
+      <div class="section-body" id="secLove"></div>
+    </div>
+
+    <div class="card">
+      <h2>재물운</h2>
+      <div class="section-body" id="secWealth"></div>
+    </div>
+
+    <div class="card">
+      <h2>부모 · 자식운</h2>
+      <div class="section-body" id="secFamily"></div>
+    </div>
+
+    <div class="card">
+      <h2>대세운 · 길흉 사건 (현재 기준 전1년 ~ 후5년)</h2>
+      <div class="section-body year-grid" id="secYears"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chatSection">
+      <h2>✦ 집중 질문 · 상세 분석</h2>
+      <p class="hint" style="margin-bottom:10px;">분석된 천궁을 바탕으로 특정 주제에 대해 더 깊이 물어보세요. 예: "2027년 직업 변화", "배우자 성향", "재물 상승 시기" 등</p>
+      <div class="chat-box" id="chatBox">
+        <div class="msg bot"><div class="bubble">천궁도 분석이 완료되었습니다. 궁금한 주제를 입력해 주세요. 성향, 직업, 연애, 재물, 가족, 특정 연도 길흉 등 어떤 주제든 집중 해석해 드립니다.</div></div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="질문을 입력하세요..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn" onclick="sendChat()">전송</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>본 앱은 서양 점성학(Tropical) 근사 계산을 사용합니다. 정확한 에페메리스·하우스 시스템은 전문 소프트웨어를 참고하세요.</footer>
+</div>
+
+<script>
+// ========== ZODIAC DATA ==========
+const SIGNS = [
+  { name: '양자리', en: 'Aries', element: '불', modality: '활동', ruler: '화성', keywords: ['독립', '추진력', '용기', '즉흥'] },
+  { name: '황소자리', en: 'Taurus', element: '흙', modality: '고정', ruler: '금성', keywords: ['안정', '감각', '인내', '소유'] },
+  { name: '쌍둥이자리', en: 'Gemini', element: '공기', modality: '변동', ruler: '수성', keywords: ['소통', '호기심', '다재다능', '변화'] },
+  { name: '게자리', en: 'Cancer', element: '물', modality: '활동', ruler: '달', keywords: ['감정', '보호', '직감', '가족'] },
+  { name: '사자자리', en: 'Leo', element: '불', modality: '고정', ruler: '태양', keywords: ['자존감', '창의', '리더십', '표현'] },
+  { name: '처녀자리', en: 'Virgo', element: '흙', modality: '변동', ruler: '수성', keywords: ['분석', '섬세', '봉사', '완성'] },
+  { name: '천칭자리', en: 'Libra', element: '공기', modality: '활동', ruler: '금성', keywords: ['균형', '관계', '미학', '조화'] },
+  { name: '전갈자리', en: 'Scorpio', element: '물', modality: '고정', ruler: '명왕성', keywords: ['깊이', '변신', '통찰', '집착'] },
+  { name: '사수자리', en: 'Sagittarius', element: '불', modality: '변동', ruler: '목성', keywords: ['자유', '철학', '확장', '모험'] },
+  { name: '염소자리', en: 'Capricorn', element: '흙', modality: '활동', ruler: '토성', keywords: ['책임', '목표', '인내', '성취'] },
+  { name: '물병자리', en: 'Aquarius', element: '공기', modality: '고정', ruler: '천왕성', keywords: ['독창', '인도주의', '미래', '독립'] },
+  { name: '물고기자리', en: 'Pisces', element: '물', modality: '변동', ruler: '해왕성', keywords: ['공감', '상상', '영성', '용해'] }
+];
+
+const SIGN_KO = SIGNS.map(s => s.name);
+
+// ========== ASTRONOMY HELPERS (approx, tropical) ==========
+function toJulian(y, m, d, h=0, mi=0) {
+  if (m <= 2) { y--; m += 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5
+       + (h + mi / 60) / 24;
+}
+
+function sunLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  M = M * Math.PI / 180;
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+          + 0.000289 * Math.sin(3 * M);
+  let lon = (L0 + C) % 360;
+  if (lon < 0) lon += 360;
+  return lon;
+}
+
+function moonLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  let Lp = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T;
+  let D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T;
+  let M = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T;
+  let Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T;
+  let F = 93.2720950 + 483202.0175233 * T - 0.0036539 * T * T;
+  D *= Math.PI / 180; M *= Math.PI / 180; Mp *= Math.PI / 180; F *= Math.PI / 180;
+  const lon = Lp
+    + 6.289 * Math.sin(Mp)
+    + 1.274 * Math.sin(2 * D - Mp)
+    + 0.658 * Math.sin(2 * D)
+    + 0.214 * Math.sin(2 * Mp)
+    - 0.186 * Math.sin(M)
+    - 0.114 * Math.sin(2 * F);
+  let r = lon % 360;
+  if (r < 0) r += 360;
+  return r;
+}
+
+function meanSidereal(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  let theta = 280.46061837 + 360.98564736629 * (jd - 2451545.0)
+            + 0.000387933 * T * T - T * T * T / 38710000;
+  theta = theta % 360;
+  if (theta < 0) theta += 360;
+  return theta;
+}
+
+function ascendant(jd, lat, lon) {
+  // Approximate RAMC and obliquity
+  const theta = meanSidereal(jd) + lon;
+  const eps = 23.4393 - 0.0000004 * (jd - 2451545.0); // rough
+  const latR = lat * Math.PI / 180;
+  const epsR = eps * Math.PI / 180;
+  const ramc = theta * Math.PI / 180;
+  // Asc formula
+  const y = -Math.cos(ramc);
+  const x = Math.sin(ramc) * Math.cos(epsR) + Math.tan(latR) * Math.sin(epsR);
+  let asc = Math.atan2(y, x) * 180 / Math.PI;
+  asc = (asc + 180) % 360; // adjust quadrant roughly
+  if (asc < 0) asc += 360;
+  // Better simple house: use local sidereal + offset by latitude effect
+  // Fallback simpler rotation for demo stability
+  const hourAngle = ((jd % 1) * 24 + lon / 15);
+  const base = (sunLongitude(jd) + (hourAngle * 15) * 0.98) % 360;
+  // blend for smoother result
+  let final = (0.35 * asc + 0.65 * base) % 360;
+  if (final < 0) final += 360;
+  return final;
+}
+
+function planetApprox(jd, name) {
+  // Very rough mean longitudes for display (not precision ephemeris)
+  const T = (jd - 2451545.0) / 36525;
+  const means = {
+    mercury: 252.25 + 149472.67 * T,
+    venus: 181.98 + 58517.82 * T,
+    mars: 355.43 + 19140.30 * T,
+    jupiter: 34.35 + 3034.91 * T,
+    saturn: 50.08 + 1222.11 * T
+  };
+  let l = means[name] % 360;
+  if (l < 0) l += 360;
+  return l;
+}
+
+function lonToSign(lon) {
+  const idx = Math.floor(lon / 30) % 12;
+  const deg = lon % 30;
+  return { sign: SIGNS[idx], index: idx, degree: deg, lon };
+}
+
+// ========== INTERPRETATION ENGINE ==========
+let CHART = null;
+
+function elementHarmony(s1, s2, s3) {
+  const els = [s1.element, s2.element, s3.element];
+  const count = {};
+  els.forEach(e => count[e] = (count[e] || 0) + 1);
+  const dominant = Object.entries(count).sort((a,b) => b[1]-a[1])[0];
+  return { dominant: dominant[0], count };
+}
+
+function buildPersonality(c) {
+  const sun = c.sun.sign, moon = c.moon.sign, asc = c.asc.sign;
+  const harm = elementHarmony(sun, moon, asc);
+  let txt = `<p>당신의 <strong>태양</strong>은 <span class="tag">${sun.name}</span>(${sun.element}·${sun.modality}), <strong>달</strong>은 <span class="tag">${moon.name}</span>, <strong>상승</strong>은 <span class="tag">${asc.name}</span>입니다. Big 3가 만들어내는 핵심 기질은 다음과 같습니다.</p>`;
+  txt += `<p><strong>외적 인상(상승 ${asc.name})</strong> — 첫인상과 대인 태도는 ${asc.keywords.join('·')} 성향이 강하게 드러납니다. 사람들은 당신을 ${asc.keywords[0]}적이고 ${asc.keywords[1]}한 사람으로 기억하기 쉽습니다.</p>`;
+  txt += `<p><strong>자아 핵심(태양 ${sun.name})</strong> — 삶의 목적과 자존감의 중심은 ${sun.keywords.join(', ')}에 있습니다. ${sun.element} 원소의 에너지로 세상을 탐색하며, ${sun.modality} 기질로 목표에 접근합니다.</p>`;
+  txt += `<p><strong>감정·욕구(달 ${moon.name})</strong> — 내적 안정과 정서 패턴은 ${moon.keywords.join('·')} 축으로 움직입니다. 스트레스 상황에서는 ${moon.name}의 본능적 반응이 먼저 나타납니다.</p>`;
+  if (harm.dominant === '불') txt += `<p>전체적으로 <strong>불 기운</strong>이 두드러져 추진력과 표현력이 강하고, 정체되면 답답함을 크게 느낍니다.</p>`;
+  else if (harm.dominant === '흙') txt += `<p>전체적으로 <strong>흙 기운</strong>이 강해 현실·안정·실리를 중시하며, 느리더라도 확실한 기반을 쌓는 스타일입니다.</p>`;
+  else if (harm.dominant === '공기') txt += `<p>전체적으로 <strong>공기 기운</strong>이 우세해 사고·소통·네트워크가 삶의 핵심 자원입니다. 아이디어와 관계의 흐름이 중요합니다.</p>`;
+  else txt += `<p>전체적으로 <strong>물 기운</strong>이 강해 공감·직관·정서적 깊이가 강점입니다. 분위기와 관계의 미묘한 변화에 민감합니다.</p>`;
+  return txt;
+}
+
+function buildTalent(c) {
+  const sun = c.sun.sign, moon = c.moon.sign, asc = c.asc.sign;
+  const talents = [...new Set([...sun.keywords, ...moon.keywords.slice(0,2), ...asc.keywords.slice(0,1)])];
+  let txt = `<p><strong>타고난 재능</strong></p><ul>`;
+  talents.slice(0,5).forEach(k => txt += `<li>${k} — ${sun.name}/${moon.name} 조합에서 자연스럽게 발휘되는 영역</li>`);
+  txt += `</ul>`;
+  txt += `<p><strong>개발이 필요한 지점</strong></p><ul>`;
+  // opposite tendencies
+  const weak = [];
+  if (sun.element === '불') weak.push('세밀한 계획과 지속적 루틴 유지');
+  if (sun.element === '흙') weak.push('즉흥적 도전과 감정적 표현');
+  if (sun.element === '공기') weak.push('한 가지에 깊이 몰입하는 집중력');
+  if (sun.element === '물') weak.push('경계 설정과 현실적 우선순위 정리');
+  if (moon.modality === '고정') weak.push('변화에 대한 유연한 수용');
+  if (moon.modality === '변동') weak.push('결정 후 끝까지 밀어붙이는 끈기');
+  if (asc.element !== sun.element) weak.push('겉으로 보이는 이미지와 속마음 사이의 간극 조율');
+  weak.slice(0,4).forEach(w => txt += `<li>${w}</li>`);
+  txt += `</ul><p>강점을 직업·관계에서 전면에 두고, 약점은 ‘의식적 훈련’ 영역으로 분리해 관리하면 균형이 좋아집니다.</p>`;
+  return txt;
+}
+
+function buildCareer(c) {
+  const sun = c.sun.sign, moon = c.moon.sign, asc = c.asc.sign;
+  const fields = {
+    '불': ['리더십·경영', '마케팅·브랜딩', '스포츠·엔터', '스타트업·도전 사업'],
+    '흙': ['금융·부동산', '의료·헬스케어', '제조·품질관리', '전문직(회계·법무)'],
+    '공기': ['미디어·콘텐츠', '교육·컨설팅', 'IT·기획', '외교·홍보'],
+    '물': ['심리·상담', '예술·창작', '복지·케어', '연구·분석']
+  };
+  const f = fields[sun.element] || fields['공기'];
+  let txt = `<p>태양의 ${sun.element} 기운과 상승 ${asc.name}의 대인 스타일이 맞물려, 아래 분야와의 적성이 높게 나타납니다.</p><ul>`;
+  f.forEach(x => txt += `<li>${x}</li>`);
+  txt += `</ul>`;
+  txt += `<p><strong>직업운 흐름</strong> — 목성·토성 주기의 영향으로, 20대 후반~30대 초반에 방향 전환 또는 전문성 심화의 기회가 열리기 쉽고, 40대에 사회적 위치와 책임이 본격화되는 패턴이 일반적입니다. 현재 시점에서는 ${sun.keywords[0]}와 ${asc.keywords[0]}를 결합한 역할(예: 팀을 이끌면서도 ${moon.keywords[0]}적 배려가 있는 포지션)이 성과를 내기 좋습니다.</p>`;
+  return txt;
+}
+
+function buildJobStruct(c) {
+  const sun = c.sun.sign, asc = c.asc.sign, moon = c.moon.sign;
+  // ranking logic
+  let scores = { org: 50, biz: 50, free: 50 };
+  if (sun.element === '흙' || sun.name === '염소자리') scores.org += 25;
+  if (sun.element === '불' || sun.name === '사자자리' || sun.name === '양자리') scores.biz += 22;
+  if (sun.element === '공기' || sun.modality === '변동') scores.free += 20;
+  if (asc.element === '공기') scores.free += 10;
+  if (moon.element === '물') scores.free += 5;
+  if (sun.ruler === '토성') scores.org += 15;
+  if (sun.ruler === '목성') scores.biz += 12;
+
+  const ranked = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const labels = { org: '조직(회사·기관)', biz: '사업·창업', free: '프리랜스·독립' };
+  const desc = {
+    org: '안정적 보상 체계, 역할 분담, 장기 커리어 트랙이 잘 맞습니다. 승진·전문직 트랙에서 힘을 발휘하기 쉽습니다.',
+    biz: '리스크를 감수하고 비전을 실행하는 환경에서 동기부여가 큽니다. 브랜드·제품·서비스를 직접 키우는 일에 적합합니다.',
+    free: '자율성·다양성·프로젝트 단위 일이 에너지를 줍니다. 전문 스킬을 패키징해 여러 클라이언트와 일하는 형태가 유리합니다.'
+  };
+  let txt = `<ul class="rank-list">`;
+  ranked.forEach(([k, v], i) => {
+    txt += `<li><span class="rank-num">${i+1}</span><div><strong>${labels[k]}</strong> (적합도 ${v}점)<br>${desc[k]}</div></li>`;
+  });
+  txt += `</ul>`;
+  txt += `<p>1순위 구조를 중심으로 가되, 2순위를 ‘부업·사이드’ 또는 ‘장기 전환 목표’로 병행하면 리스크가 분산됩니다. 분야는 앞서 제시한 ${sun.element} 계열 적성 분야와 결합할 때 시너지가 큽니다.</p>`;
+  return txt;
+}
+
+function buildLove(c) {
+  const sun = c.sun.sign, moon = c.moon.sign, asc = c.asc.sign;
+  const venusIdx = Math.floor(c.venus / 30) % 12;
+  const venus = SIGNS[venusIdx];
+  let txt = `<p><strong>이성운</strong> — 금성 ${venus.name}의 영향으로 끌리는 스타일은 ${venus.keywords.join('·')} 쪽에 가깝습니다. 연애에서 ${moon.name} 달의 정서 욕구(안정·공감·자극 등)가 충족될 때 관계가 깊어집니다.</p>`;
+  txt += `<p><strong>배우자운</strong> — 상승의 7하우스 계열(대척점 기운)과 금성·달의 조화가 중요합니다. 배우자에게서 ${sun.element === '불' ? '활력과 인정' : sun.element === '흙' ? '신뢰와 현실 지원' : sun.element === '공기' ? '지적 교류와 자유' : '정서적 교감과 이해'}를 강하게 원합니다.</p>`;
+  txt += `<p>관계의 위기 패턴은 대개 ‘의사소통 단절’ 또는 ‘가치관 충돌’에서 시작됩니다. ${asc.name} 상승의 대인 매너를 유지하면서도, ${moon.name}의 속마음을 주기적으로 언어화하는 연습이 장기 관계에 도움이 됩니다.</p>`;
+  return txt;
+}
+
+function buildWealth(c) {
+  const sun = c.sun.sign, jupIdx = Math.floor(c.jupiter / 30) % 12;
+  const jup = SIGNS[jupIdx];
+  let txt = `<p>재물의 기본 흐름은 <strong>태양 ${sun.name}</strong>의 가치관과 <strong>목성 ${jup.name}</strong>의 확장 방식으로 읽습니다.</p>`;
+  txt += `<ul>
+    <li><strong>수입 스타일</strong> — ${sun.element === '흙' || sun.name === '염소자리' ? '꾸준한 급여·자산 증식형' : sun.element === '불' ? '성과·보너스·사업 수익형' : sun.element === '공기' ? '지식·네트워크·로열티형' : '전문 서비스·창작·돌봄 보상형'}에 가깝습니다.</li>
+    <li><strong>투자·지출</strong> — 목성 ${jup.name}이 가리키는 영역에서 ‘과도한 낙관’이 나타나기 쉽습니다. 한 번에 크게 베팅하기보다 분할·검증 후 확장하는 편이 유리합니다.</li>
+    <li><strong>재물 상승 키</strong> — 본업에서의 전문성 강화 + ${sun.keywords[0]}를 수익 모델에 직접 연결하는 것이 핵심입니다.</li>
+  </ul>`;
+  return txt;
+}
+
+function buildFamily(c) {
+  const moon = c.moon.sign, sun = c.sun.sign;
+  let txt = `<p><strong>부모와의 관계</strong> — 달 ${moon.name}은 양육 환경과 모성/보호 패턴을 상징합니다. ${moon.keywords[0]}·${moon.keywords[1]} 이슈가 어린 시절 정서의 중심이었을 가능성이 있습니다. 성인이 된 지금은 그 패턴을 의식적으로 재선택하는 단계입니다.</p>`;
+  txt += `<p><strong>자식운</strong> — 태양과 5하우스 계열의 창의·돌봄 에너지가 자녀와의 관계 스타일을 만듭니다. ${sun.element === '불' ? '함께 활동하고 격려하는' : sun.element === '흙' ? '안정된 환경을 제공하는' : sun.element === '공기' ? '대화와 호기심을 나누는' : '감정을 세심히 살피는'} 부모 역할이 자연스럽습니다.</p>`;
+  txt += `<p>가족 안에서의 갈등은 대개 ‘기대의 불일치’에서 옵니다. 각자의 별자리 기질 차이를 인정하는 대화가 관계를 부드럽게 만듭니다.</p>`;
+  return txt;
+}
+
+function buildYears(c) {
+  const now = 2026;
+  const years = [];
+  // simple personal year cycle from birth year + sun sign influence
+  const birthYear = c.birthYear;
+  for (let y = now - 1; y <= now + 5; y++) {
+    const age = y - birthYear;
+    const cycle = (y + c.sun.index) % 9; // rough personal year 1-9
+    let tone, title, body;
+    if (cycle === 1 || cycle === 5) {
+      tone = 'good'; title = '시작·확장의 해';
+      body = '새로운 프로젝트, 이사, 관계 시작 등 ‘문’이 열리는 흐름. 과감한 도전보다 ‘방향 설정 후 실행’이 길합니다. 상반기에 기회가 집중될 수 있습니다.';
+    } else if (cycle === 2 || cycle === 6) {
+      tone = 'warn'; title = '조정·협력의 해';
+      body = '혼자 밀어붙이기보다 파트너십·팀워크가 성과를 좌우합니다. 건강·루틴 점검이 필요. 갈등은 대화로 풀면 관계가 한 단계 깊어집니다.';
+    } else if (cycle === 3 || cycle === 7) {
+      tone = 'good'; title = '표현·학습의 해';
+      body = '공부, 자격, 콘텐츠, 발표 등 ‘드러내는 일’에 운이 따릅니다. 단기 성과보다 포트폴리오를 쌓는 관점이 유리합니다.';
+    } else if (cycle === 4 || cycle === 8) {
+      tone = 'warn'; title = '기반·책임의 해';
+      body = '재정·계약·가족 책임이 무거워질 수 있습니다. 무리한 확장보다 내실. 하반기에 구조 개편이나 직장/사업 재정비 이슈가 나올 수 있습니다.';
+    } else {
+      tone = 'bad'; title = '정리·전환의 해';
+      body = '마무리와 비움의 주기. 불필요한 관계·지출·습관을 정리하면 다음 사이클이 가벼워집니다. 큰 결정(이직·결혼·투자)은 가능한 한 연말 이후로 미루는 편이 안전합니다.';
+    }
+    // slight personalization
+    body += ` ${c.sun.sign.name} 태양 기준으로는 ‘${c.sun.sign.keywords[0]}’ 테마가 그해의 선택 기준이 됩니다.`;
+    years.push({ y, age, tone, title, body });
+  }
+  let html = '';
+  years.forEach(yr => {
+    html += `<div class="year-card ${yr.tone}"><div class="yr">${yr.y}년 (만 ${yr.age}세) · ${yr.title}</div><div>${yr.body}</div></div>`;
+  });
+  return html;
+}
+
+// ========== MAIN ==========
+document.getElementById('citySelect').addEventListener('change', function() {
+  document.getElementById('customLoc').style.display = this.value === 'custom' ? 'grid' : 'none';
+});
+
+function runAnalysis() {
+  const dateStr = document.getElementById('birthDate').value;
+  const timeStr = document.getElementById('birthTime').value;
+  if (!dateStr || !timeStr) { alert('생년월일과 시간을 입력해 주세요.'); return; }
+
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [hh, mm] = timeStr.split(':').map(Number);
+
+  let lat, lon;
+  const city = document.getElementById('citySelect').value;
+  if (city === 'custom') {
+    lat = parseFloat(document.getElementById('lat').value);
+    lon = parseFloat(document.getElementById('lon').value);
+    if (isNaN(lat) || isNaN(lon)) { alert('위도/경도를 올바르게 입력해 주세요.'); return; }
+  } else {
+    [lat, lon] = city.split(',').map(Number);
+  }
+
+  // Assume KST (UTC+9) for Korean cities; for custom still treat input as local and shift approx
+  const jd = toJulian(y, m, d, hh - 9, mm); // to UT approx
+
+  const sunLon = sunLongitude(jd);
+  const moonLon = moonLongitude(jd);
+  const ascLon = ascendant(jd, lat, lon);
+  const merc = planetApprox(jd, 'mercury');
+  const ven = planetApprox(jd, 'venus');
+  const mar = planetApprox(jd, 'mars');
+  const jup = planetApprox(jd, 'jupiter');
+  const sat = planetApprox(jd, 'saturn');
+
+  CHART = {
+    birthYear: y, birthDate: dateStr, birthTime: timeStr, lat, lon,
+    sun: lonToSign(sunLon),
+    moon: lonToSign(moonLon),
+    asc: lonToSign(ascLon),
+    mercury: merc, venus: ven, mars: mar, jupiter: jup, saturn: sat
+  };
+
+  // Render Big 3
+  document.getElementById('big3Box').innerHTML = `
+    <div class="big3-item"><div class="label">태양 ☉</div><div class="sign">${CHART.sun.sign.name}</div><div class="degree">${CHART.sun.degree.toFixed(1)}°</div></div>
+    <div class="big3-item"><div class="label">달 ☽</div><div class="sign">${CHART.moon.sign.name}</div><div class="degree">${CHART.moon.degree.toFixed(1)}°</div></div>
+    <div class="big3-item"><div class="label">상승 ASC</div><div class="sign">${CHART.asc.sign.name}</div><div class="degree">${CHART.asc.degree.toFixed(1)}°</div></div>
+  `;
+
+  const pNames = [
+    ['수성', CHART.mercury], ['금성', CHART.venus], ['화성', CHART.mars],
+    ['목성', CHART.jupiter], ['토성', CHART.saturn]
+  ];
+  document.getElementById('planetBox').innerHTML = pNames.map(([n, lon]) => {
+    const s = lonToSign(lon);
+    return `<span class="planet-chip"><strong>${n}</strong> ${s.sign.name} ${s.degree.toFixed(0)}°</span>`;
+  }).join('');
+
+  document.getElementById('metaInfo').textContent =
+    `출생: ${dateStr} ${timeStr} · 위치: 위도 ${lat.toFixed(2)}, 경도 ${lon.toFixed(2)} (지역 보정 반영) · Tropical 근사`;
+
+  document.getElementById('secPersonality').innerHTML = buildPersonality(CHART);
+  document.getElementById('secTalent').innerHTML = buildTalent(CHART);
+  document.getElementById('secCareer').innerHTML = buildCareer(CHART);
+  document.getElementById('secJobStruct').innerHTML = buildJobStruct(CHART);
+  document.getElementById('secLove').innerHTML = buildLove(CHART);
+  document.getElementById('secWealth').innerHTML = buildWealth(CHART);
+  document.getElementById('secFamily').innerHTML = buildFamily(CHART);
+  document.getElementById('secYears').innerHTML = buildYears(CHART);
+
+  document.getElementById('resultSection').style.display = 'block';
+  document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== CHAT ==========
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q || !CHART) return;
+  const box = document.getElementById('chatBox');
+  box.innerHTML += `<div class="msg user"><div class="bubble">${escapeHtml(q)}</div></div>`;
+  input.value = '';
+  const ans = answerQuestion(q);
+  setTimeout(() => {
+    box.innerHTML += `<div class="msg bot"><div class="bubble">${ans}</div></div>`;
+    box.scrollTop = box.scrollHeight;
+  }, 400);
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function answerQuestion(q) {
+  const c = CHART;
+  const lower = q.toLowerCase();
+  const has = (...keys) => keys.some(k => q.includes(k));
+
+  // Year specific
+  const yearMatch = q.match(/20(2[5-9]|3[0-1])/);
+  if (yearMatch || has('세운', '올해', '내년', '길흉', '사건')) {
+    const y = yearMatch ? parseInt(yearMatch[0]) : 2026;
+    const age = y - c.birthYear;
+    const cycle = (y + c.sun.index) % 9;
+    let tone = cycle === 9 || cycle === 0 ? '정리·전환' : (cycle % 2 === 1 ? '확장·표현' : '기반·조정');
+    return `<strong>${y}년 집중 해석</strong> (만 ${age}세)<br><br>` +
+      `개인 주기상 <em>${tone}</em> 흐름이 강합니다. 태양 ${c.sun.sign.name}의 ‘${c.sun.sign.keywords[0]}’ 테마를 그해의 의사결정 기준으로 삼으세요.<br><br>` +
+      `· <strong>직업</strong>: ${cycle === 1 || cycle === 5 ? '이직·확장·새 프로젝트에 유리. 상반기 기회가 많을 수 있음.' : cycle === 4 || cycle === 8 ? '기존 위치 다지기·계약 재검토. 무리한 이직은 신중.' : '학습·네트워킹·포트폴리오 강화가 성과로 이어짐.'}<br>` +
+      `· <strong>관계</strong>: 달 ${c.moon.sign.name} 욕구(${c.moon.sign.keywords.slice(0,2).join('·')})가 충족되는 사람과 깊어지기 쉽습니다.<br>` +
+      `· <strong>재물</strong>: ${c.sun.element === '흙' ? '저축·자산 정리가 길함' : '수입원 다각화 실험이 가능하나 한도에 여유를 둘 것'}.<br><br>` +
+      `큰 결정은 해당 연도 대세운 카드의 톤(길/주의)을 참고하고, 가능하면 하반기 이후를 권합니다.`;
+  }
+
+  if (has('성향', '성격', '기질', '특징', '나는')) {
+    return buildPersonality(c).replace(/<\/?p>/g, '<br>').replace(/<br><br>/g, '<br>') +
+      `<br><br>요약하면, 겉은 <strong>${c.asc.sign.name}</strong>, 핵심은 <strong>${c.sun.sign.name}</strong>, 속마음은 <strong>${c.moon.sign.name}</strong>입니다. 이 세 층의 간극을 스스로 인정할수록 대인 관계가 편해집니다.`;
+  }
+
+  if (has('재능', '강점', '약점', '개발', '성장')) {
+    return buildTalent(c).replace(/<\/?p>/g, '<br>').replace(/<\/?ul>/g, '').replace(/<li>/g, '· ').replace(/<\/li>/g, '<br>');
+  }
+
+  if (has('직업', '진로', '커리어', '일', '적성', '회사', '이직')) {
+    return buildCareer(c).replace(/<\/?p>/g, '<br>').replace(/<\/?ul>/g, '').replace(/<li>/g, '· ').replace(/<\/li>/g, '<br>') +
+      `<br>` + buildJobStruct(c).replace(/<\/?p>/g, '<br>').replace(/<[^>]+>/g, m => m.includes('rank') || m.includes('strong') || m.includes('div') || m.includes('span') || m.includes('li') || m.includes('ul') ? m : '');
+  }
+
+  if (has('연애', '이성', '배우자', '결혼', '사랑', '남자', '여자', '썸')) {
+    return buildLove(c).replace(/<\/?p>/g, '<br>');
+  }
+
+  if (has('재물', '돈', '금전', '재테크', '투자', '수입')) {
+    return buildWealth(c).replace(/<\/?p>/g, '<br>').replace(/<\/?ul>/g, '').replace(/<li>/g, '· ').replace(/<\/li>/g, '<br>');
+  }
+
+  if (has('부모', '자식', '자녀', '가족', '아이')) {
+    return buildFamily(c).replace(/<\/?p>/g, '<br>');
+  }
+
+  if (has('상승', '빅3', 'big', '태양', '달', '행성')) {
+    return `현재 천궁 요약입니다.<br><br>` +
+      `☉ 태양 <strong>${c.sun.sign.name}</strong> ${c.sun.degree.toFixed(1)}° — 자아·목적<br>` +
+      `☽ 달 <strong>${c.moon.sign.name}</strong> ${c.moon.degree.toFixed(1)}° — 감정·안정<br>` +
+      `ASC 상승 <strong>${c.asc.sign.name}</strong> ${c.asc.degree.toFixed(1)}° — 태도·첫인상<br><br>` +
+      `수성·금성·화성·목성·토성 위치는 상단 행성 칩을 참고하세요. 특정 행성에 대해 더 물어보시면 집중 해석합니다.`;
+  }
+
+  // default
+  return `질문 주신 「${escapeHtml(q)}」에 대해, 현재 천궁(태양 ${c.sun.sign.name} · 달 ${c.moon.sign.name} · 상승 ${c.asc.sign.name})을 기준으로 보면 다음과 같습니다.<br><br>` +
+    `핵심은 <strong>${c.sun.sign.keywords[0]}</strong>와 <strong>${c.moon.sign.keywords[0]}</strong>의 균형을 맞추는 것입니다. ` +
+    `이 주제를 더 구체적으로(예: 연도, 직업/연애/재물 중 하나) 말씀해 주시면 해당 영역에 맞춰 깊게 풀어 드리겠습니다.`;
+}
+</script>
+</body>
+</html>
